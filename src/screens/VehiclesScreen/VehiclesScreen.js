@@ -3,7 +3,7 @@ import {SafeAreaView, StyleSheet} from 'react-native';
 import AddCarIcon from '@images/addCarIcon_outlined.png';
 
 import AddVehicleModal from './AddVehicleModal';
-import IconButton from '@components/IconButton/IconButton';
+import IconButton from '@components/IconButton';
 
 const VehiclesScreen = () => {
   const [modalOpen, setModalOpen] = useState(false);
