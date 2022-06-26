@@ -4,26 +4,33 @@ import {
   ImageBackground,
   Modal,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
-  Text,
   View,
 } from 'react-native';
+import {useForm} from 'react-hook-form';
 import {launchImageLibrary} from 'react-native-image-picker';
+
 import UploadImageIcon from '@images/uploadImageIcon_outlined.png';
 import EditIconOutlined from '@images/edit_outlined.png';
 import IconButton from '@components/IconButton';
 import Button from '@components/Button';
+import Input from '@components/Input';
+import Select from '@components/Select';
+import {postVehicle} from '@api/vehicles';
 
 const AddVehicleModal = ({modalOpen, setModalOpen}) => {
   const [resourcePath, setResourcePath] = useState({});
-  const [make, setMake] = useState('');
-  const [model, setModel] = useState('');
-  const [year, setYear] = useState('');
-  const [color, setColor] = useState('');
-  const [fuelType, setFuelType] = useState('');
+  const {control, handleSubmit, reset} = useForm();
 
-  const URI = resourcePath?.assets ? resourcePath?.assets[0].uri : 'NONE';
+  const onSubmit = data => {
+    alert(JSON.stringify(data));
+    const vehicleData = {
+      ...data,
+      image: resourcePath,
+    };
+    postVehicle(vehicleData);
+    reset();
+  };
 
   imageGalleryLaunch = () => {
     let options = {
@@ -46,27 +53,10 @@ const AddVehicleModal = ({modalOpen, setModalOpen}) => {
     });
   };
 
-  const handleChangeMake = () => {
-    setMake(make);
-  };
-
-  const handleChangeModel = () => {
-    setModel(model);
-  };
-
-  const handleChangeYear = () => {
-    setYear(year);
-  };
-
-  const handleChangeColor = () => {
-    setColor(color);
-  };
-
-  const handleChangeFuelType = () => {
-    setFuelType(fuelType);
-  };
+  const URI = resourcePath?.assets ? resourcePath?.assets[0].uri : 'NONE';
 
   const handleToggleModal = () => {
+    reset();
     setModalOpen(!modalOpen);
   };
 
@@ -98,47 +88,40 @@ const AddVehicleModal = ({modalOpen, setModalOpen}) => {
         </ImageBackground>
         <View style={styles.form}>
           <View style={styles.formGrid}>
-            <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Make</Text>
-              <TextInput
-                value={make}
-                onChangeText={handleChangeMake}
-                style={styles.formInput}
-              />
-            </View>
-            <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Model</Text>
-              <TextInput
-                value={model}
-                onChangeText={handleChangeModel}
-                style={styles.formInput}
-              />
-            </View>
+            <Input
+              label="Make"
+              name="make"
+              control={control}
+              placeholder="Nissan"
+            />
+            <Input
+              label="Model"
+              name="model"
+              control={control}
+              placeholder="Qashqai"
+            />
           </View>
           <View style={styles.formGrid}>
-            <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Year</Text>
-              <TextInput
-                value={year}
-                onChangeText={handleChangeYear}
-                style={styles.formInput}
-              />
-            </View>
-            <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Fuel Type</Text>
-              <TextInput
-                value={fuelType}
-                onChangeText={handleChangeFuelType}
-                style={styles.formInput}
-              />
-            </View>
+            <Input
+              label="Year"
+              name="year"
+              control={control}
+              placeholder="2018"
+              keyboardType="numeric"
+            />
+            <Select
+              label="Fuel Type"
+              data={['Diesel', 'Electric', 'Gas', 'Petrol', 'Other']}
+              name="fuelType"
+              control={control}
+            />
           </View>
-          <View style={styles.formRow}>
-            <Text style={styles.formLabel}>Color</Text>
-            <TextInput
-              value={color}
-              onChangeText={handleChangeColor}
-              style={styles.formInput}
+          <View style={styles.formGrid}>
+            <Input
+              label="Color"
+              name="color"
+              control={control}
+              placeholder="Black"
             />
           </View>
           <View style={styles.formCTA}>
@@ -147,7 +130,11 @@ const AddVehicleModal = ({modalOpen, setModalOpen}) => {
               variant="outlined"
               action={handleToggleModal}
             />
-            <Button text="Save" variant="gradient" />
+            <Button
+              text="Save"
+              variant="contained"
+              action={handleSubmit(onSubmit)}
+            />
           </View>
         </View>
       </View>
@@ -156,6 +143,7 @@ const AddVehicleModal = ({modalOpen, setModalOpen}) => {
 };
 
 export default AddVehicleModal;
+
 const styles = StyleSheet.create({
   modalContainer: {
     backgroundColor: '#325a80',
@@ -192,22 +180,6 @@ const styles = StyleSheet.create({
   },
   formGrid: {
     flexDirection: 'row',
-  },
-  formRow: {
-    paddingBottom: 15,
-    paddingRight: 20,
-    width: '50%',
-  },
-  formLabel: {
-    fontSize: 14,
-    color: 'white',
-    marginBottom: 5,
-  },
-  formInput: {
-    backgroundColor: 'white',
-    color: 'gray',
-    borderRadius: 10,
-    padding: 10,
   },
   formCTA: {
     flexDirection: 'row',

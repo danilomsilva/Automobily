@@ -12,20 +12,9 @@ const Button = ({variant, text = '#999', action}) => {
   }
   if (variant === 'contained') {
     return (
-      <TouchableOpacity style={styles.buttonVarContained}>
+      <TouchableOpacity style={styles.buttonVarContained} onPress={action}>
         <Text style={styles.textVarContained}>{text}</Text>
       </TouchableOpacity>
-    );
-  }
-  if (variant === 'gradient') {
-    return (
-      <LinearGradient
-        colors={['#4c669f', '#3b5998', '#192f6a']}
-        style={styles.buttonVarContained}>
-        <TouchableOpacity>
-          <Text style={styles.textVarContained}>{text}</Text>
-        </TouchableOpacity>
-      </LinearGradient>
     );
   }
 
@@ -37,8 +26,6 @@ export default Button;
 const styles = StyleSheet.create({
   buttonVarText: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#fff',
     padding: 9,
     borderRadius: 10,
   },
@@ -47,17 +34,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   buttonVarContained: {
-    backgroundColor: '#000',
+    backgroundColor: 'lightblue',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 10,
     margin: 10,
     marginLeft: 15,
-    borderWidth: 1,
-    borderColor: '#fff',
   },
   textVarContained: {
-    color: '#fff',
+    color: '#000',
     fontSize: 14,
   },
 });
