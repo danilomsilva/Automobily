@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {
   Image,
   ImageBackground,
+  KeyboardAvoidingView,
   Modal,
   StyleSheet,
   TouchableOpacity,
@@ -16,7 +17,7 @@ import IconButton from '@components/IconButton';
 import Button from '@components/Button';
 import Input from '@components/Input';
 import Select from '@components/Select';
-import {postVehicle} from '@api/vehicles';
+import {postVehicle} from '@api/vehiclesAPI';
 
 const AddVehicleModal = ({modalOpen, setModalOpen}) => {
   const [resourcePath, setResourcePath] = useState({});
@@ -68,7 +69,7 @@ const AddVehicleModal = ({modalOpen, setModalOpen}) => {
       onRequestClose={() => {
         setModalOpen(false);
       }}>
-      <View style={styles.modalContainer}>
+      <KeyboardAvoidingView behavior="padding" style={styles.modalContainer}>
         <ImageBackground
           source={{uri: URI}}
           style={styles.modalImageBackground}>
@@ -137,7 +138,7 @@ const AddVehicleModal = ({modalOpen, setModalOpen}) => {
             />
           </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
