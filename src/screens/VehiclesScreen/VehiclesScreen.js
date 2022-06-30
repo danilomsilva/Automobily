@@ -1,66 +1,88 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, StyleSheet, View, Image, Text} from 'react-native';
-import AddCarIcon from '@images/addCarIcon_outlined.png';
+import {
+  SafeAreaView,
+  StyleSheet,
+  View,
+  Image,
+  Text,
+  ActivityIndicator,
+} from 'react-native';
 
 import AddVehicleModal from './AddVehicleModal';
 import IconButton from '@components/IconButton';
-import DefaultVehicleImage from '@images/defaultVehicleImage.jpg';
+import ActionButtons from '@components/ActionButtons';
 
+import AddCarIcon from '@images/addCarIcon_outlined.png';
+import DefaultVehicleImage from '@images/defaultVehicleImage.jpg';
 import VehicleColorIcon from '@images/vehicleColorIcon_contained.png';
 import VehicleFuelIcon from '@images/vehicleFuelIcon_contained.png';
 import VehicleMileageIcon from '@images/vehicleMileageIcon_contained.png';
 import VehicleYearIcon from '@images/vehicleYearIcon_contained.png';
 
-import EditIconOutlined from '@images/edit_outlined.png';
-
-import {getVehicles} from '@api/vehiclesAPI';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import {getVehicles, deleteVehicle} from '@api/vehiclesAPI';
 
 const VehiclesScreen = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [vehicles, setVehicles] = useState([]);
-  const myVehicle = vehicles && vehicles[0];
+  const {make, model, year, color, fuelType, mileage} = vehicles?.values;
+  const isVehicleRegistered = vehicles.hasOwnProperty('id');
 
   useEffect(() => {
     getVehicles().then(data => {
-      setVehicles(Object.values(data));
+      if (!data) return;
+      setVehicles({id: Object.keys(data)[0], values: Object.values(data)[0]});
     });
-  }, []);
+  }, [getVehicles]);
 
   const handleToggleModal = () => {
     setModalOpen(!modalOpen);
   };
 
+  const handleDeleteVehicle = () => {
+    setIsLoading(true);
+
+    setTimeout(() => {
+      deleteVehicle(vehicles?.id);
+      setIsLoading(false);
+    }, 2000);
+  };
+
+  const editVehicle = () => {
+    console.log('editing vehicle');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      {myVehicle ? (
+      {isLoading && (
+        <View style={styles.fullOverlay}>
+          <ActivityIndicator size="large" color="#ffff" />
+        </View>
+      )}
+
+      {isVehicleRegistered ? (
         <View style={styles.vehicleContainer}>
           <Image source={DefaultVehicleImage} style={styles.vehicleImage} />
-          <TouchableOpacity style={styles.removeButton}>
-            <Image source={EditIconOutlined} style={styles.editIcon} />
-          </TouchableOpacity>
           <View style={styles.vehicleInfo}>
             <Text style={styles.vehicleName}>
-              {myVehicle?.make} {myVehicle?.model}
+              {make} {model}
             </Text>
             <View style={styles.vehicleDetails}>
               <View style={styles.vehicleDetail}>
                 <Image source={VehicleYearIcon} style={styles.vehicleIcon} />
-                <Text style={styles.vehicleInfoText}>{myVehicle?.year}</Text>
+                <Text style={styles.vehicleInfoText}>{year}</Text>
               </View>
               <View style={styles.vehicleDetail}>
                 <Image source={VehicleFuelIcon} style={styles.vehicleIcon} />
-                <Text style={styles.vehicleInfoText}>
-                  {myVehicle?.fuelType}
-                </Text>
+                <Text style={styles.vehicleInfoText}>{fuelType}</Text>
               </View>
               <View style={styles.vehicleDetail}>
                 <Image source={VehicleColorIcon} style={styles.vehicleIcon} />
-                <Text style={styles.vehicleInfoText}>{myVehicle?.color}</Text>
+                <Text style={styles.vehicleInfoText}>{color}</Text>
               </View>
               <View style={styles.vehicleDetail}>
                 <Image source={VehicleMileageIcon} style={styles.vehicleIcon} />
-                <Text style={styles.vehicleInfoText}>{myVehicle?.mileage}</Text>
+                <Text style={styles.vehicleInfoText}>{mileage}</Text>
               </View>
             </View>
           </View>
@@ -73,6 +95,12 @@ const VehiclesScreen = () => {
         />
       )}
       <AddVehicleModal modalOpen={modalOpen} setModalOpen={setModalOpen} />
+      {isVehicleRegistered && (
+        <ActionButtons
+          deleteAction={handleDeleteVehicle}
+          editAction={editVehicle}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -97,7 +125,7 @@ const styles = StyleSheet.create({
   vehicleInfo: {
     flex: 1,
     backgroundColor: 'white',
-    padding: 40,
+    padding: 30,
   },
   vehicleName: {
     fontSize: 40,
@@ -116,17 +144,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f5f5f5',
     borderRadius: 20,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingVertical: 10,
   },
   vehicleInfoText: {
     marginTop: 10,
+    color: '#8c8c8c',
   },
-  removeButton: {
-    backgroundColor: 'red',
+  fullOverlay: {
     position: 'absolute',
     top: 0,
+    left: 0,
     right: 0,
-    padding: 10,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
 });

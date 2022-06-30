@@ -12,16 +12,20 @@ import {useForm} from 'react-hook-form';
 import {launchImageLibrary} from 'react-native-image-picker';
 
 import UploadImageIcon from '@images/uploadImageIcon_outlined.png';
-import EditIconOutlined from '@images/edit_outlined.png';
+import EditIconOutlined from '@images/editIcon_outlined.png';
+import DefaultVehicleImage from '@images/defaultVehicleImage.jpg';
+
 import IconButton from '@components/IconButton';
 import Button from '@components/Button';
 import Input from '@components/Input';
 import Select from '@components/Select';
+
 import {postVehicle} from '@api/vehiclesAPI';
 
 const AddVehicleModal = ({modalOpen, setModalOpen}) => {
   const [resourcePath, setResourcePath] = useState({});
   const {control, handleSubmit, reset} = useForm();
+  const URI = resourcePath?.assets ? resourcePath?.assets[0].uri : 'NONE';
 
   const onSubmit = data => {
     alert(JSON.stringify(data));
@@ -54,11 +58,14 @@ const AddVehicleModal = ({modalOpen, setModalOpen}) => {
     });
   };
 
-  const URI = resourcePath?.assets ? resourcePath?.assets[0].uri : 'NONE';
-
   const handleToggleModal = () => {
     reset();
     setModalOpen(!modalOpen);
+  };
+
+  const handleAddVehicle = () => {
+    console.log('handleAddVehicle');
+    () => handleSubmit(onSubmit);
   };
 
   return (
@@ -70,23 +77,26 @@ const AddVehicleModal = ({modalOpen, setModalOpen}) => {
         setModalOpen(false);
       }}>
       <KeyboardAvoidingView behavior="padding" style={styles.modalContainer}>
-        <ImageBackground
-          source={{uri: URI}}
-          style={styles.modalImageBackground}>
-          {URI === 'NONE' ? (
+        {URI === 'NONE' ? (
+          <View style={styles.modalImageBackground}>
             <IconButton
               iconSource={UploadImageIcon}
               buttonText="Upload Picture"
               action={imageGalleryLaunch}
             />
-          ) : (
+          </View>
+        ) : (
+          <ImageBackground
+            source={{uri: URI}}
+            style={styles.modalImageBackground}>
             <TouchableOpacity
               style={styles.editButton}
               onPress={imageGalleryLaunch}>
               <Image source={EditIconOutlined} style={styles.editIcon} />
             </TouchableOpacity>
-          )}
-        </ImageBackground>
+          </ImageBackground>
+        )}
+
         <View style={styles.form}>
           <View style={styles.formGrid}>
             <Input
@@ -131,11 +141,7 @@ const AddVehicleModal = ({modalOpen, setModalOpen}) => {
               variant="outlined"
               action={handleToggleModal}
             />
-            <Button
-              text="Save"
-              variant="contained"
-              action={handleSubmit(onSubmit)}
-            />
+            <Button text="Save" variant="contained" action={handleAddVehicle} />
           </View>
         </View>
       </KeyboardAvoidingView>

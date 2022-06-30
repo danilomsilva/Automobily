@@ -18,3 +18,12 @@ export const postVehicle = async data => {
     },
   );
 };
+
+export const deleteVehicle = async id => {
+  await fetch(
+    `https://automobily-default-rtdb.europe-west1.firebasedatabase.app/vehicles/${id}.json`,
+    {
+      method: 'DELETE',
+    },
+  );
+};
