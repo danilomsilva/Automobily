@@ -13,29 +13,18 @@ import {launchImageLibrary} from 'react-native-image-picker';
 
 import UploadImageIcon from '@images/uploadImageIcon_outlined.png';
 import EditIconOutlined from '@images/editIcon_outlined.png';
-import DefaultVehicleImage from '@images/defaultVehicleImage.jpg';
 
 import IconButton from '@components/IconButton';
 import Button from '@components/Button';
 import Input from '@components/Input';
 import Select from '@components/Select';
 
-import {postVehicle} from '@api/vehiclesAPI';
-
-const AddVehicleModal = ({modalOpen, setModalOpen}) => {
+const AddVehicleModal = ({modalOpen, setModalOpen, handleAddVehicle}) => {
   const [resourcePath, setResourcePath] = useState({});
-  const {control, handleSubmit, reset} = useForm();
+  const {control, handleSubmit, reset, watch} = useForm();
   const URI = resourcePath?.assets ? resourcePath?.assets[0].uri : 'NONE';
 
-  const onSubmit = data => {
-    alert(JSON.stringify(data));
-    const vehicleData = {
-      ...data,
-      image: resourcePath,
-    };
-    postVehicle(vehicleData);
-    reset();
-  };
+  console.log('watch', watch());
 
   imageGalleryLaunch = () => {
     let options = {
@@ -59,13 +48,8 @@ const AddVehicleModal = ({modalOpen, setModalOpen}) => {
   };
 
   const handleToggleModal = () => {
-    reset();
     setModalOpen(!modalOpen);
-  };
-
-  const handleAddVehicle = () => {
-    console.log('handleAddVehicle');
-    () => handleSubmit(onSubmit);
+    reset();
   };
 
   return (
@@ -141,7 +125,14 @@ const AddVehicleModal = ({modalOpen, setModalOpen}) => {
               variant="outlined"
               action={handleToggleModal}
             />
-            <Button text="Save" variant="contained" action={handleAddVehicle} />
+            <Button
+              text="Save"
+              variant="contained"
+              action={handleSubmit(data => {
+                handleAddVehicle(data, resourcePath);
+                handleToggleModal();
+              })}
+            />
           </View>
         </View>
       </KeyboardAvoidingView>

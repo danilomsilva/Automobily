@@ -19,21 +19,21 @@ import VehicleFuelIcon from '@images/vehicleFuelIcon_contained.png';
 import VehicleMileageIcon from '@images/vehicleMileageIcon_contained.png';
 import VehicleYearIcon from '@images/vehicleYearIcon_contained.png';
 
-import {getVehicles, deleteVehicle} from '@api/vehiclesAPI';
+import {getVehicles, deleteVehicle, postVehicle} from '@api/vehiclesAPI';
 
 const VehiclesScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [vehicles, setVehicles] = useState([]);
+  const [isVehicleRegistered, setIsVehicleRegistered] = useState(false);
   const {make, model, year, color, fuelType, mileage} = vehicles?.values;
-  const isVehicleRegistered = vehicles.hasOwnProperty('id');
 
   useEffect(() => {
     getVehicles().then(data => {
       if (!data) return;
       setVehicles({id: Object.keys(data)[0], values: Object.values(data)[0]});
     });
-  }, [getVehicles]);
+  }, [isVehicleRegistered]);
 
   const handleToggleModal = () => {
     setModalOpen(!modalOpen);
@@ -41,16 +41,27 @@ const VehiclesScreen = () => {
 
   const handleDeleteVehicle = () => {
     setIsLoading(true);
-
-    setTimeout(() => {
-      deleteVehicle(vehicles?.id);
+    deleteVehicle(vehicles?.id).then(() => {
       setIsLoading(false);
-    }, 2000);
+      setIsVehicleRegistered(false);
+    });
   };
 
-  const editVehicle = () => {
-    console.log('editing vehicle');
+  const handleAddVehicle = (data, resourcePath) => {
+    const vehicleData = {
+      ...data,
+      image: resourcePath,
+    };
+    setIsLoading(true);
+    postVehicle(vehicleData).then(() => {
+      setIsLoading(false);
+      setIsVehicleRegistered(true);
+    });
   };
+
+  // const editVehicle = () => {
+  //   console.log('editing vehicle');
+  // };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -94,11 +105,15 @@ const VehiclesScreen = () => {
           action={handleToggleModal}
         />
       )}
-      <AddVehicleModal modalOpen={modalOpen} setModalOpen={setModalOpen} />
+      <AddVehicleModal
+        modalOpen={modalOpen}
+        setModalOpen={setModalOpen}
+        handleAddVehicle={handleAddVehicle}
+      />
       {isVehicleRegistered && (
         <ActionButtons
           deleteAction={handleDeleteVehicle}
-          editAction={editVehicle}
+          // editAction={editVehicle}
         />
       )}
     </SafeAreaView>

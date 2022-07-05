@@ -2,7 +2,7 @@ import React from 'react';
 import {TouchableOpacity, Image, Text, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const Button = ({variant, text = '#999', action}) => {
+const Button = ({variant, text = '#999', action, enabled = false}) => {
   if (variant === 'outlined') {
     return (
       <TouchableOpacity style={styles.buttonVarText} onPress={action}>
@@ -12,7 +12,14 @@ const Button = ({variant, text = '#999', action}) => {
   }
   if (variant === 'contained') {
     return (
-      <TouchableOpacity style={styles.buttonVarContained} onPress={action}>
+      <TouchableOpacity
+        style={
+          enabled
+            ? styles.buttonVarContained
+            : [styles.buttonVarContained, styles.buttonDisabled]
+        }
+        onPress={action}
+        activeOpacity={enabled ? 0.5 : 1}>
         <Text style={styles.textVarContained}>{text}</Text>
       </TouchableOpacity>
     );
@@ -41,8 +48,11 @@ const styles = StyleSheet.create({
     margin: 10,
     marginLeft: 15,
   },
+  buttonDisabled: {
+    backgroundColor: 'gray',
+  },
   textVarContained: {
-    color: '#000',
+    color: '#666',
     fontSize: 14,
   },
 });
