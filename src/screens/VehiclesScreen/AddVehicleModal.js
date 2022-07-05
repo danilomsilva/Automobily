@@ -1,57 +1,21 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   Image,
   ImageBackground,
-  KeyboardAvoidingView,
   Modal,
+  Pressable,
   StyleSheet,
-  TouchableOpacity,
+  TextInput,
+  Text,
   View,
 } from 'react-native';
-import {useForm} from 'react-hook-form';
-import {launchImageLibrary} from 'react-native-image-picker';
 
+import DefaultCarImage from '@images/defaultCarImage.jpeg';
 import UploadImageIcon from '@images/uploadImageIcon_outlined.png';
-import EditIconOutlined from '@images/editIcon_outlined.png';
 
-import IconButton from '@components/IconButton';
-import Button from '@components/Button';
-import Input from '@components/Input';
-import Select from '@components/Select';
+import IconButton from '@components/IconButton/IconButton';
 
-const AddVehicleModal = ({modalOpen, setModalOpen, handleAddVehicle}) => {
-  const [resourcePath, setResourcePath] = useState({});
-  const {control, handleSubmit, reset, watch} = useForm();
-  const URI = resourcePath?.assets ? resourcePath?.assets[0].uri : 'NONE';
-
-  console.log('watch', watch());
-
-  imageGalleryLaunch = () => {
-    let options = {
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
-    };
-
-    launchImageLibrary(options, res => {
-      if (res.didCancel) {
-        console.log('User cancelled image picker'); //TODO
-      } else if (res.error) {
-        console.log('ImagePicker Error: ', res.error); //TODO
-      } else if (res.customButton) {
-        console.log('User tapped custom button: ', res.customButton); //TODO
-      } else {
-        setResourcePath(res);
-      }
-    });
-  };
-
-  const handleToggleModal = () => {
-    setModalOpen(!modalOpen);
-    reset();
-  };
-
+const AddVehicleModal = ({modalOpen, setModalOpen}) => {
   return (
     <Modal
       visible={modalOpen}
@@ -60,91 +24,27 @@ const AddVehicleModal = ({modalOpen, setModalOpen, handleAddVehicle}) => {
       onRequestClose={() => {
         setModalOpen(false);
       }}>
-      <KeyboardAvoidingView behavior="padding" style={styles.modalContainer}>
-        {URI === 'NONE' ? (
-          <View style={styles.modalImageBackground}>
-            <IconButton
-              iconSource={UploadImageIcon}
-              buttonText="Upload Picture"
-              action={imageGalleryLaunch}
-            />
-          </View>
-        ) : (
-          <ImageBackground
-            source={{uri: URI}}
-            style={styles.modalImageBackground}>
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={imageGalleryLaunch}>
-              <Image source={EditIconOutlined} style={styles.editIcon} />
-            </TouchableOpacity>
-          </ImageBackground>
-        )}
-
-        <View style={styles.form}>
-          <View style={styles.formGrid}>
-            <Input
-              label="Make"
-              name="make"
-              control={control}
-              placeholder="Nissan"
-            />
-            <Input
-              label="Model"
-              name="model"
-              control={control}
-              placeholder="Qashqai"
-            />
-          </View>
-          <View style={styles.formGrid}>
-            <Input
-              label="Year"
-              name="year"
-              control={control}
-              placeholder="2018"
-              keyboardType="numeric"
-            />
-            <Select
-              label="Fuel Type"
-              data={['Diesel', 'Electric', 'Gas', 'Petrol', 'Other']}
-              name="fuelType"
-              control={control}
-            />
-          </View>
-          <View style={styles.formGrid}>
-            <Input
-              label="Color"
-              name="color"
-              control={control}
-              placeholder="Black"
-            />
-          </View>
-          <View style={styles.formCTA}>
-            <Button
-              text="Cancel"
-              variant="outlined"
-              action={handleToggleModal}
-            />
-            <Button
-              text="Save"
-              variant="contained"
-              action={handleSubmit(data => {
-                handleAddVehicle(data, resourcePath);
-                handleToggleModal();
-              })}
-            />
-          </View>
-        </View>
-      </KeyboardAvoidingView>
+      <View style={styles.modalContainer}>
+        <ImageBackground
+          source={DefaultCarImage}
+          style={styles.modalImageBackground}>
+          <IconButton
+            iconSource={UploadImageIcon}
+            buttonText="Upload Picture"
+            action={() => {
+              alert('open gallery and select picture');
+            }}
+          />
+        </ImageBackground>
+      </View>
     </Modal>
   );
 };
 
 export default AddVehicleModal;
-
 const styles = StyleSheet.create({
   modalContainer: {
-    backgroundColor: '#325a80',
+    backgroundColor: 'orange',
     borderTopEndRadius: 30,
     borderTopLeftRadius: 30,
     overflow: 'hidden',
@@ -156,34 +56,5 @@ const styles = StyleSheet.create({
     height: 200,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  editButton: {
-    backgroundColor: 'white',
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    borderRadius: 90,
-    height: 40,
-    width: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  editIcon: {
-    width: 25,
-    height: 25,
-  },
-  form: {
-    paddingLeft: 20,
-    paddingTop: 20,
-  },
-  formGrid: {
-    flexDirection: 'row',
-  },
-  formCTA: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    marginBottom: 20,
-    marginRight: 10,
   },
 });
