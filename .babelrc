@@ -14,8 +14,7 @@
           "@components": "./src/components",
           "@containers": "./src/containers",
           "@images": "./src/assets/images",
-          "@screens": "./src/screens",
-          "@api": "./src/api"
+          "@screens": "./src/screens"
         }
       }
     ]
